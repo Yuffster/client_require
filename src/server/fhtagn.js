@@ -202,7 +202,6 @@ function listen(server) {
 				}
 			});	
 		}
-		console.log('Fhtagn is serving from '+settings.web_root+'. Ia! Ia!');
 	});
 
 }

@@ -1,0 +1,14 @@
+{
+	"name" : "client_require",
+	"description" : "NPM modules packaged with a CommonJS module interface and served synchronously to the client.",
+	"version" : "0.0.1",
+	"author" : "Michelle Steigerwalt <msteigerwalt.com>",
+	"repository" : {
+		"type" : "git",
+		"url" : "git://github.com/Yuffster/client_require.git"
+	},
+	"dependencies":{
+		"glob": "*"
+	},
+	"main": "src/server/fhtagn.js"
+}

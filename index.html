@@ -1,0 +1,252 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Client require by Yuffster</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/Yuffster/client_require">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/Yuffster/client_require/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/Yuffster/client_require/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Client require</h1>
+          <p>NPM modules packaged with a CommonJS module interface and served synchronously to the client.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/Yuffster">Yuffster</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>Client Require</h1>
+
+<p>This library allows you to run your Node.JS application on the client side using
+standard CommonJS module syntax.  It supports loading client files from
+dependency NPM packages and easily branching between client and server modules
+when necessary.</p>
+
+<p>In development mode, loaded package files will present error messages in the
+browser which match the filename and line number of the related server-side
+file.</p>
+
+<p>In production mode, packages will be placed within a single closure with no
+leaking scope.</p>
+
+<h2>Reading Manuals is for Nerds!</h2>
+
+<p>To play around with a demo repository which loads jQuery from NPM in a
+constrained namespace along with two other NPM modules (uuid-v4 and sillynames), 
+visit <a href="http://github.com/Yuffster/client_require_demo">http://github.com/Yuffster/client_require_demo</a>.</p>
+
+<h2>Credits</h2>
+
+<p>Copyright 2012-2013 by Michelle Steigerwalt <a href="http://msteigerwalt.com">http://msteigerwalt.com</a> and licensed
+under the MIT license.</p>
+
+<p>If you find this library useful, please let me know!</p>
+
+<h3>Built Using</h3>
+
+<ul>
+<li>
+<a href="http://labjs.com/">LAB.js</a> by Getify Solutions <a href="http://getify.com/">http://getify.com/</a>
+</li>
+<li>
+<a href="http://marijn.haverbeke.nl/uglifyjs">UglifyJS</a> by Mihai Bazon 
+<a href="http://mihai.bazon.net/blog">http://mihai.bazon.net/blog</a>
+</li>
+</ul><h2>Using Modules</h2>
+
+<p>In your package.json, list your dependencies as you normally would, and add an
+additional configuration field called "client_dependencies", which is a list of
+module names.</p>
+
+<pre><code>{
+    "main": "app.js",
+    "dependencies": {
+        "client_require": "*",
+        "uuid-v4": "*"
+    }
+    "client_dependencies": ['uuid-v4']
+}
+</code></pre>
+
+<p>Type <code>npm install</code> as usual to install the dependencies.</p>
+
+<h3>Vanilla Node.js</h3>
+
+<p>In your Node.js app, pass requests as they come in to client_require.handle.</p>
+
+<pre><code>var client_require = require('client_require');
+
+var http = require('http');
+var app  = http.createServer(function(req,res) {
+    //Let client_require try to handle this if it can.
+    if (client_require.handle(req,res)) return;
+    //Otherwise, handle it as usual.
+    res.write("Hello, world!");
+    //Don't forget to add the script tag that loads all the other scripts!
+    res.end('&lt;script src="'+client_require.get_src+'"&gt;&lt;/script&gt;');
+});
+
+app.listen(3000, 'localhost');
+</code></pre>
+
+<h3>Connect Middleware</h3>
+
+<p>If you're using Connect, you can use the .connect() handler instead.</p>
+
+<pre><code>app.use(require('client_require').connect());
+</code></pre>
+
+<h3>Loading the Scripts</h3>
+
+<p>To load all your scripts in development and production mode, just require the
+base include, which by default is <code>/js/client_require.js</code>.  It's best to place
+this file at the <strong>end of your document</strong>, so the module can load all necessary 
+script files in a nonblocking manner.</p>
+
+<pre><code>&lt;script src="/js/client_require.js"&gt;&lt;/script&gt;
+</code></pre>
+
+<h2>Packaging Modules for the Client</h2>
+
+<p>When client_require looks through your node_module, it will open up your
+package.json file and look for a <code>client_require</code> key, which should point to
+where your main files live (and you're either using client/server 
+differentiation or aren't calling server-side Node modules).  </p>
+
+<p>If you don't have a <code>client_require</code> key, but do have a <code>main</code> key,
+client_require will load the file specified (but no others which might be
+required within the main module).</p>
+
+<h2>Configuration</h2>
+
+<p>To change the default settings of client_require, you can use the <code>.set()</code> 
+function.</p>
+
+<pre><code>var client_require = require('client_require');
+
+client_require.set('web_root', '/assets/scripts/');
+</code></pre>
+
+<h3>Options</h3>
+
+<h4>web_root</h4>
+
+<p>Defaults to <code>/js/</code>.</p>
+
+<p>This will be appended to all script srcs, and only requests
+with a path which starts with this string will be served.</p>
+
+<h4>include_file</h4>
+
+<p>Defaults to <code>client_require.js</code>.</p>
+
+<p>The main file which will then load all other necessary scripts.</p>
+
+<h4>app_root</h4>
+
+<p>Defaults to <code>process.env.PWD</code> (the directory in which you type the <code>node</code> 
+command to launch the webserver).</p>
+
+<p>client_require will start by indexing all JavaScript files within this file and
+all dependent files listed in the package.json in this directory.</p>
+
+<h4>env</h4>
+
+<p>Defaults to <code>process.env.NODE_ENV</code> or 'development'.  If your server is in 
+development mode, all modules will be served as their own file.  In production,
+all files will be packaged into one JavaScript file.</p>
+
+<h3>uglify</h3>
+
+<p>Defaults to <code>true</code>.  When set to true, production code will be minified
+using the NPM module for <a href="http://marijnhaverbeke.nl//uglifyjs">Uglify</a>.</p>
+
+<h2>Client/Server Alternation</h2>
+
+<p>If you want to have separate versions of particular files for the client and 
+the server, you can do so by placing the module in a directory called client/
+or server/, respectively.</p>
+
+<p>Example:</p>
+
+<pre><code>server/
+    app.js
+client/
+    app.js
+</code></pre>
+
+<p>This will create a module file at the root path <code>app.js</code>. client/app.js will
+be loaded on the client and server/app.js will be loaded on the server.</p>
+
+<p>On the server-side, you must use the <code>require</code> method exported by the library
+to properly load server-side files.</p>
+
+<h2>API Methods</h2>
+
+<h3>connect</h3>
+
+<p>When called as a function, this will return a Connect module, which can be 
+attached to any Connect application.</p>
+
+<pre><code>app.use(client_require.connect());
+</code></pre>
+
+<h3>handle</h3>
+
+<p>You can pass a request object to client_require.handle within your HTTP request
+handler.  If the request matches client_require's web_path, the handle
+method will return true, and a response will be sent once it's available.</p>
+
+<pre><code>if (client_require.handle(req,res)) return;
+</code></pre>
+
+<h3>require</h3>
+
+<p>This is useful on the server-side, as the standard <code>require</code> function is not
+able to be overloaded.  This will make sure you load server/foo.js when there
+is no root foo.js available, which mimicks the client-side functionality.</p>
+
+<h3>set</h3>
+
+<p>Sets a configuration key to the provided value.</p>
+
+<pre><code>client_require.set('app_root', __dirname);
+</code></pre>
+
+<h3>get_src</h3>
+
+<p>Returns the web-accessible path to the main application JavaScript, which will
+in turn load all other modules.</p>
+
+<pre><code>res.write('&lt;script src="'+client_require.get_src()+'"&gt;&lt;/script&gt;');
+</code></pre>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>

@@ -130,7 +130,7 @@ function getScripts(cb) {
 				unpend();
 			});
 		});
-	};
+	}
 
 	for (var p in require_paths) walk(require_paths[p], true);
 	walk(settings.app_root, true);

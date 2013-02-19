@@ -1,7 +1,7 @@
 {
 	"name" : "client_require",
 	"description" : "NPM modules packaged with a CommonJS module interface and served synchronously to the client.",
-	"version" : "0.0.4",
+	"version" : "0.0.5",
 	"author" : "Michelle Steigerwalt <msteigerwalt.com>",
 	"repository" : {
 		"type" : "git",

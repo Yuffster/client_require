@@ -101,6 +101,7 @@ function getScripts(cb) {
 			d = JSON.parse(d || "{}");
 			var deps  = d.client_dependencies || [],
 			    index = d.main;
+			if (!index.match(/\.js$/)) index += '.js';
 			deps.forEach(function(dep) {
 				walk(path.join(p, 'node_modules', dep));
 			});
@@ -136,11 +137,31 @@ function getScripts(cb) {
 
 }
 
+var packed = false, packCallbacks = [], packPending = false;
 function packScripts(scripts,cb) {
+
+	if (!cb) return;
+
+	if (packed) return cb(false, packed);
+
+	packCallbacks.push(cb);
+
+	if (packPending) return;
+
+	packPending = true;
 
 	// Separating the manifest from the files allows us to load each file once
 	// without losing its module path aliases.
 	var files = {}, manifest = {};
+
+	function callback(e) {
+		packed = files;
+		var p = packCallbacks.shift();
+		while(p) {
+			p(null,packed);
+			p = packCallbacks.shift();
+		}
+	}
 
 	var moduleTemplate = path.join(__dirname, '..', 'templates', 'module.js');
 	var indexFile;
@@ -180,8 +201,92 @@ function packScripts(scripts,cb) {
 			};
 			files[f.web_path] = pack;
 		});
-		cb(null,files);
+		callback();
 	});
+
+}
+
+function getInitCode() {
+	var out = "";
+	initPaths.forEach(function(p) {
+		out += '\n'+REQUIRE_METH+'("'+p+'");';
+	});
+	return out;
+}
+
+var compiled = false, compilerCallbacks = [], compiling = false;
+function compileScripts(cb) {
+
+	if (compiled) return cb(null, compiled);
+	if (cb) compilerCallbacks.push(cb);
+	if (compiling) return;
+
+	compiling = true;
+
+	function callback(e) {
+		compiling = false;
+		var p = compilerCallbacks.shift();
+		while(p) {
+			p(null,packed);
+			p = compilerCallbacks.shift();
+		}
+	}
+
+	getScripts(function(e,scripts) {
+
+		packScripts(scripts, function(e,files) {
+
+			var q = [], modules = "";
+
+			for (var f in files) q.push(files[f]);
+			function next() {
+				var f = q.shift();
+				if (!f) return serveModules();
+				f(function(e,d) {
+					modules += d;
+					next();
+				});
+			} next();
+
+			function serveModules() {
+				var app = path.join(
+					__dirname, '..', 'templates', 'global_closure.js'
+				), fhtagn = path.join(
+					__dirname, '..', 'client', 'fhtagn.js'
+				);
+				fs.readFile(app, 'utf-8', function(e,tmp) {
+					fs.readFile(fhtagn, 'utf-8', function(e,fhtagn) {
+						if (e) return cb(e);
+						tmp = tmp.split("{{fhtagn.js}}").join(fhtagn);
+						tmp = tmp.split("{{modules}}").join(modules);
+						tmp = tmp.split("{{initialize}}").join(getInitCode());
+						if (settings.uglify) {
+							//Compress with UglifyJs
+							var jsp  = require("uglify-js").parser,
+							    pro  = require("uglify-js").uglify,
+							    code = jsp.parse(tmp);
+							code = pro.ast_mangle(code); 
+							code = pro.ast_squeeze(code);
+							tmp  = pro.gen_code(code);
+						}
+						compiled = tmp;
+						callback();
+					});
+				});
+			}
+
+		});
+
+	});
+
+	function callback(e) {
+		compiling = false;
+		var p = compilerCallbacks.shift();
+		while(p) {
+			p(null,packed);
+			p = compilerCallbacks.shift();
+		}
+	}
 
 }
 
@@ -191,9 +296,8 @@ function new_require(p) {
 		p = path.normalize(path.join(path.dirname(module.parent.id),p));
 	}
 
-	var sp = p.split(/\/|\\/);
-	sp.splice(sp.length-1, 0, 'server');
-	sp = sp.join('/');
+	var mpath = path.dirname(module.parent.filename),
+	    sp    = mpath.replace(/server/, '')+p;
 
 	//If the module doesn't exist, check in the server/ path.
 	if (!path.existsSync(p) && path.existsSync(sp)) p = sp;
@@ -214,17 +318,9 @@ function getSrcs(cb) {
 
 function serveScript(p, cb) {
 
-	function getInitCode() {
-		var out = "";
-		initPaths.forEach(function(p) {
-			out += '\n'+REQUIRE_METH+'("'+p+'");';
-		});
-		return out;
-	}
-
 	p = settings.web_root+p;
 
-	var is_app =  (p==settings.web_root+settings.include_file);
+	var is_app = (p==settings.web_root+settings.include_file);
 
 	getScripts(function(e,scripts) {
 
@@ -261,48 +357,7 @@ function serveScript(p, cb) {
 
 			} else {
 
-				var q = [], modules = "";
-				for (var f in files) q.push(files[f]);
-				function next() {
-					var f = q.shift();
-					if (!f) return serveModules();
-					f(function(e,d) {
-						modules += d;
-						next();
-					});
-				} next();
-
-				function serveModules() {
-
-					if (is_app) {
-
-						var app = path.join(
-							__dirname, '..', 'templates', 'global_closure.js'
-						), fhtagn = path.join(
-							__dirname, '..', 'client', 'fhtagn.js'
-						);
-
-						fs.readFile(app, 'utf-8', function(e,tmp) {
-							fs.readFile(fhtagn, 'utf-8', function(e,fhtagn) {
-								tmp = tmp.split("{{fhtagn.js}}").join(fhtagn);
-								tmp = tmp.split("{{modules}}").join(modules);
-								tmp = tmp.split("{{initialize}}").join(getInitCode());
-								if (settings.uglify) {
-									//Compress with UglifyJs
-									var jsp  = require("uglify-js").parser,
-									    pro  = require("uglify-js").uglify,
-									    code = jsp.parse(tmp);
-									code = pro.ast_mangle(code); 
-									code = pro.ast_squeeze(code);
-									tmp  = pro.gen_code(code);
-								} cb(e,tmp);
-							});
-						});
-
-					} else {
-						cb(e||"File not found");
-					}
-				}
+				if (is_app) return compileScripts(cb);
 
 			}
 
@@ -312,20 +367,32 @@ function serveScript(p, cb) {
 
 }
 
+function handle(req,res) {
+
+	var url  = require('url').parse(req.url).path,
+	    patt = '^'+settings.web_root.replace('/', '\/')+'(.*)$',
+	    m    = url.match(new RegExp(patt));
+
+	if (!m) return false;
+
+	serveScript(m[1], function(e,d) {
+		if (e) {
+			res.writeHead('404');
+			res.end("File not found");
+		} else {
+			res.writeHead('200');
+			res.end(d);
+		}
+	});
+
+	return true;
+	
+}
+
 function listen(server) {
 
 	server.on('request', function (req,res) {
-
-		var url  = require('url').parse(req.url).path,
-	    patt = '^'+settings.web_root.replace('/', '\/')+'(.*)$',
-		m    = url.match(new RegExp(patt));
-
-		if (!m) return;
-
-		serveScript(m[1], function(d) {
-			if (d) res.end(d);
-		});
-
+		handle(req, res);
 	});
 
 }
@@ -333,39 +400,28 @@ function listen(server) {
 function connect_server() {
 
 	return function(req, res, next) {
-
-		var url  = require('url').parse(req.url).path,
-		    patt = '^'+settings.web_root.replace('/', '\/')+'(.*)$',
-			m    = url.match(new RegExp(patt));
-
-		if (!m) return next();
-
-		serveScript(m[1], function(e,d) {
-			if (e) {
-				res.writeHead('404');
-				res.end("File not found");
-			} else {
-				res.end(d);
-			}
-		});
-
+		if (!handle(req,res)) next();
 	}
 
 }
 
 function getIncludePath() {
-	return settings.web_root+settings.app_root;
+	return settings.web_root+settings.include_file;
 }
 
 function add_path(p) {
 	require_paths.push(p);
 }
 
+if (settings.env=="production") {
+	compileScripts();
+}
+
 module.exports = {
-	listen   : listen,
 	set      : config,
 	require  : new_require,
 	connect  : connect_server,
 	add_path : add_path,
-	get_src  : getIncludePath
+	get_src  : getIncludePath,
+	handle   : handle
 };

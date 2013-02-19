@@ -42,26 +42,27 @@ module names.
 
 Type `npm install` as usual to install the dependencies.
 
-In your Node.js app, pass an instance of your HTTP server to client_require:
-
 ### Vanilla Node.js
+
+In your Node.js app, pass requests as they come in to client_require.handle.
 
 	var client_require = require('client_require');
 
 	var http = require('http');
-	var app  = http.createServer();
-
-	require('client_require').listen(app);
-
-	app.on('request', function (req, res) {
-		//Your normal code here, doing whatever.
+	var app  = http.createServer(function(req,res) {
+		//Let client_require try to handle this if it can.
+		if (client_require.handle(req,res)) return;
+		//Otherwise, handle it as usual.
+		res.write("Hello, world!");
+		//Don't forget to add the script tag that loads all the other scripts!
+		res.end('<script src="'+client_require.get_src+'"></script>');
 	});
 
 	app.listen(3000, 'localhost');
 
 ### Connect Middleware
 
-If you're using Connect, you can optionally use the .connect() handler.
+If you're using Connect, you can use the .connect() handler instead.
 
 	app.use(require('client_require').connect());
 
@@ -156,12 +157,13 @@ attached to any Connect application.
 
 	app.use(client_require.connect());
 
-### listen
+### handle
 
-Attaches a request event to the HTTP server to serve files which start with the
-provided web_root configuration.
+You can pass a request object to client_require.handle within your HTTP request
+handler.  If the request matches client_require's web_path, the handle
+method will return true, and a response will be sent once it's available.
 
-	client_require.listen(app);
+	if (client_require.handle(req,res)) return;
 
 ### require
 

@@ -12,6 +12,19 @@ file.
 In production mode, packages will be placed within a single closure with no
 leaking scope.
 
+## Credits
+
+Copyright 2012-2013 by Michelle Steigerwalt <http://msteigerwalt.com> and licensed
+under the MIT license.
+
+If you find this library useful, please let me know!
+
+### Built Using
+
+* [LAB.js](http://labjs.com/) by Getify Solutions <http://getify.com/>
+* [UglifyJS](http://marijn.haverbeke.nl/uglifyjs) by Mihai Bazon 
+<http://mihai.bazon.net/blog>
+
 ## Usage
 
 In your package.json, list your dependencies as you normally would, and add an

@@ -25,7 +25,7 @@ If you find this library useful, please let me know!
 * [UglifyJS](http://marijn.haverbeke.nl/uglifyjs) by Mihai Bazon 
 <http://mihai.bazon.net/blog>
 
-## Usage
+## Using Modules
 
 In your package.json, list your dependencies as you normally would, and add an
 additional configuration field called "client_dependencies", which is a list of
@@ -73,6 +73,17 @@ this file at the **end of your document**, so the module can load all necessary
 script files in a nonblocking manner.
 
 	<script src="/js/client_require.js"></script>
+
+## Packaging Modules for the Client
+
+When client_require looks through your node_module, it will open up your
+package.json file and look for a `client_require` key, which should point to
+where your main files live (and you're either using client/server 
+differentiation or aren't calling server-side Node modules).  
+
+If you don't have a `client_require` key, but do have a `main` key,
+client_require will load the file specified (but no others which might be
+required within the main module).
 
 ## Configuration
 

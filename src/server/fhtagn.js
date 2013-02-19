@@ -353,14 +353,19 @@ function connect_server() {
 
 }
 
+function getIncludPath() {
+	return settings.web_root+settings.app_root;
+}
+
 function add_path(p) {
 	require_paths.push(p);
 }
 
 module.exports = {
-	listen: listen,
-	set: config,
-	require: new_require,
-	connect: connect_server,
-	add_path: add_path
+	listen   : listen,
+	set      : config,
+	require  : new_require,
+	connect  : connect_server,
+	add_path : add_path,
+	get_src  : getIncludePath
 };

@@ -174,3 +174,10 @@ is no root foo.js available, which mimicks the client-side functionality.
 Sets a configuration key to the provided value.
 
 	client_require.set('app_root', __dirname);
+
+### get_src
+
+Returns the web-accessible path to the main application JavaScript, which will
+in turn load all other modules.
+
+	res.write('<script src="'+client_require.get_src()+'"></script>');

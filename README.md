@@ -85,9 +85,6 @@ Defaults to `client_require.js`.
 
 The main file which will then load all other necessary scripts.
 
-	web_root     : '/js/',
-	include_file : 'client_require.js',
-
 #### app_root
 
 Defaults to `process.env.PWD` (the directory in which you type the `node` 

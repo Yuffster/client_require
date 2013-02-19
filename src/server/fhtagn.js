@@ -353,7 +353,7 @@ function connect_server() {
 
 }
 
-function getIncludPath() {
+function getIncludePath() {
 	return settings.web_root+settings.app_root;
 }
 

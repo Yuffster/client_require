@@ -401,7 +401,7 @@ function connect_server() {
 
 	return function(req, res, next) {
 		if (!handle(req,res)) next();
-	}
+	};
 
 }
 

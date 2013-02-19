@@ -41,6 +41,6 @@
 
 		throw "Cannot find module "+path+" (called from "+(rel||"root")+")";
 
-	}
+	};
 
 })(this);

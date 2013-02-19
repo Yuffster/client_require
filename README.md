@@ -12,6 +12,12 @@ file.
 In production mode, packages will be placed within a single closure with no
 leaking scope.
 
+## Reading Manuals is for Nerds!
+
+To play around with a demo repository which loads jQuery from NPM in a
+constrained namespace along with two other NPM modules (uuid-v4 and sillynames), 
+visit <http://github.com/Yuffster/client_require_demo>.
+
 ## Credits
 
 Copyright 2012-2013 by Michelle Steigerwalt <http://msteigerwalt.com> and licensed

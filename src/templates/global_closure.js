@@ -1,7 +1,11 @@
-(function() {
+(new function() {
 
-	var __fhtagn__ = {};
+	{{fhtagn.js}}
+
+	__fhtagn__ = this.__fhtagn__;
 
 	{{modules}}
+
+	{{initialize}}
 
 }());

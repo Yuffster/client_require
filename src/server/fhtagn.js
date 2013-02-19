@@ -278,16 +278,6 @@ function compileScripts(cb) {
 		});
 
 	});
-
-	function callback(e) {
-		compiling = false;
-		var p = compilerCallbacks.shift();
-		while(p) {
-			p(null,packed);
-			p = compilerCallbacks.shift();
-		}
-	}
-
 }
 
 function new_require(p) {

@@ -32,7 +32,7 @@ function getScripts(cb) {
 	var modules = [], pending = 0;
 
 	function unpend() {
-		if (pending==0) {
+		if (pending===0) {
 			scriptPending = false;
 			scripts = modules;
 			var s = scriptCallbacks.shift();

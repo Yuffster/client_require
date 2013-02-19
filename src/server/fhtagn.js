@@ -191,7 +191,7 @@ function packScripts(scripts,cb) {
 					o.content = '\n'+d+'\n';
 					o.module_path    = JSON.stringify(manifest[f.web_path]);
 					o.canonical_path = path.dirname(f.relative_path);
-					if (o.caninical_path = '.') o.caninical_path = "";
+					if (o.caninical_path === '.') o.caninical_path = "";
 					o.canonical_path = JSON.stringify(o.canonical_path);
 					var c = tmp.replace(/\{\{(\w*)\}\}/g, function(m,k) {
 						return o[k] || '';

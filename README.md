@@ -104,7 +104,7 @@ all files will be packaged into one JavaScript file.
 
 ### uglify
 
-Defaults to `true`.  When not set to true, production code will be minified
+Defaults to `true`.  When set to true, production code will be minified
 using the NPM module for [Uglify](http://marijnhaverbeke.nl//uglifyjs).
 
 ## Client/Server Alternation

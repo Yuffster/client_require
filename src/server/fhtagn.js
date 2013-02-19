@@ -6,7 +6,8 @@ var settings = {
 	web_root     : '/js/',
 	include_file : 'client_require.js',
 	app_root     : process.env.PWD,
-	env          : process.env.NODE_ENV
+	env          : process.env.NODE_ENV,
+	uglify       : true
 }, require_paths = [], initPaths = [];
 
 function config(k,v) {
@@ -286,14 +287,15 @@ function serveScript(p, cb) {
 								tmp = tmp.split("{{fhtagn.js}}").join(fhtagn);
 								tmp = tmp.split("{{modules}}").join(modules);
 								tmp = tmp.split("{{initialize}}").join(getInitCode());
-								//Compress with UglifyJs
-								var jsp  = require("uglify-js").parser,
-								    pro  = require("uglify-js").uglify,
-								    code = jsp.parse(tmp);
-								code = pro.ast_mangle(code); 
-								code = pro.ast_squeeze(code);
-								tmp  = pro.gen_code(code);
-								cb(e,tmp);
+								if (settings.uglify) {
+									//Compress with UglifyJs
+									var jsp  = require("uglify-js").parser,
+									    pro  = require("uglify-js").uglify,
+									    code = jsp.parse(tmp);
+									code = pro.ast_mangle(code); 
+									code = pro.ast_squeeze(code);
+									tmp  = pro.gen_code(code);
+								} cb(e,tmp);
 							});
 						});
 

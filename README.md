@@ -102,6 +102,11 @@ Defaults to `process.env.NODE_ENV` or 'development'.  If your server is in
 development mode, all modules will be served as their own file.  In production,
 all files will be packaged into one JavaScript file.
 
+### uglify
+
+Defaults to `true`.  When not set to true, production code will be minified
+using the NPM module for [Uglify](http://marijnhaverbeke.nl//uglifyjs).
+
 ## Client/Server Alternation
 
 If you want to have separate versions of particular files for the client and 

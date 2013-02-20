@@ -32,7 +32,7 @@ function getScripts(cb) {
 	var modules = [], pending = 0;
 
 	function unpend() {
-		if (pending==0) {
+		if (pending===0) {
 			scriptPending = false;
 			scripts = modules;
 			var s = scriptCallbacks.shift();
@@ -46,7 +46,7 @@ function getScripts(cb) {
 	function contextualize(p,modulePath) {
 
 		var file, mod, web, index, rpath,
-		    fpath   = p.split('/');
+			fpath   = p.split('/');
 
 		function rel(f) {
 			return path.relative(settings.app_root,f).replace(/\.\.\//g, '');
@@ -100,7 +100,7 @@ function getScripts(cb) {
 			pending--;
 			d = JSON.parse(d || "{}");
 			var deps  = d.client_dependencies || [],
-			    index = d.main;
+				index = d.main;
 			if (!index.match(/\.js$/)) index += '.js';
 			deps.forEach(function(dep) {
 				walk(path.join(p, 'node_modules', dep));
@@ -130,7 +130,7 @@ function getScripts(cb) {
 				unpend();
 			});
 		});
-	};
+	}
 
 	for (var p in require_paths) walk(require_paths[p], true);
 	walk(settings.app_root, true);
@@ -179,7 +179,7 @@ function packScripts(scripts,cb) {
 			manifest[f.web_path].push(f.module_path);
 			if (f.module_path != f.relative_path) {
 				manifest[f.web_path].push(f.relative_path);
-			} 
+			}
 			if (f.index_path) {
 				manifest[f.web_path].push(f.index_path);
 			}
@@ -191,9 +191,9 @@ function packScripts(scripts,cb) {
 					o.content = '\n'+d+'\n';
 					o.module_path    = JSON.stringify(manifest[f.web_path]);
 					o.canonical_path = path.dirname(f.relative_path);
-					if (o.caninical_path = '.') o.caninical_path = "";
+					if (o.caninical_path === '.') o.caninical_path = "";
 					o.canonical_path = JSON.stringify(o.canonical_path);
-					var c = tmp.replace(/{{(\w*)}}/g, function(m,k) {
+					var c = tmp.replace(/\{\{(\w*)\}\}/g, function(m,k) {
 						return o[k] || '';
 					});
 					cb(err, c);
@@ -263,9 +263,9 @@ function compileScripts(cb) {
 						if (settings.uglify) {
 							//Compress with UglifyJs
 							var jsp  = require("uglify-js").parser,
-							    pro  = require("uglify-js").uglify,
-							    code = jsp.parse(tmp);
-							code = pro.ast_mangle(code); 
+								pro  = require("uglify-js").uglify,
+								code = jsp.parse(tmp);
+							code = pro.ast_mangle(code);
 							code = pro.ast_squeeze(code);
 							tmp  = pro.gen_code(code);
 						}
@@ -278,16 +278,6 @@ function compileScripts(cb) {
 		});
 
 	});
-
-	function callback(e) {
-		compiling = false;
-		var p = compilerCallbacks.shift();
-		while(p) {
-			p(null,packed);
-			p = compilerCallbacks.shift();
-		}
-	}
-
 }
 
 function new_require(p) {
@@ -297,7 +287,7 @@ function new_require(p) {
 	}
 
 	var mpath = path.dirname(module.parent.filename),
-	    sp    = mpath.replace(/server/, '')+p;
+		sp    = mpath.replace(/server/, '')+p;
 
 	//If the module doesn't exist, check in the server/ path.
 	if (!path.existsSync(p) && path.existsSync(sp)) p = sp;
@@ -330,7 +320,7 @@ function serveScript(p, cb) {
 
 				if (is_app) {
 					var tmp = path.join(__dirname, '..', 'templates', 'client_require.js'),
-					    lab = path.join(__dirname, '..', 'templates', 'LAB.js');
+						lab = path.join(__dirname, '..', 'templates', 'LAB.js');
 					getSrcs(function(e,srcs) {
 						var includes = "$LAB";
 						srcs.forEach(function(src) {
@@ -370,8 +360,8 @@ function serveScript(p, cb) {
 function handle(req,res) {
 
 	var url  = require('url').parse(req.url).path,
-	    patt = '^'+settings.web_root.replace('/', '\/')+'(.*)$',
-	    m    = url.match(new RegExp(patt));
+		patt = '^'+settings.web_root.replace('/', '\/')+'(.*)$',
+		m    = url.match(new RegExp(patt));
 
 	if (!m) return false;
 
@@ -386,7 +376,7 @@ function handle(req,res) {
 	});
 
 	return true;
-	
+
 }
 
 function listen(server) {
@@ -401,7 +391,7 @@ function connect_server() {
 
 	return function(req, res, next) {
 		if (!handle(req,res)) next();
-	}
+	};
 
 }
 

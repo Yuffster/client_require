@@ -27,6 +27,7 @@
     "white"    : false,
     "unused"   : true,
     "smarttabs": true,
-    "shadow"   : false
+    "shadow"   : false,
+    "laxbreak" : true
 
 }

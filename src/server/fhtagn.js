@@ -46,7 +46,7 @@ function getScripts(cb) {
 	function contextualize(p,modulePath) {
 
 		var file, mod, web, index, rpath,
-			fpath   = p.split('/');
+		    fpath   = p.split('/');
 
 		function rel(f) {
 			return path.relative(settings.app_root,f).replace(/\.\.\//g, '');
@@ -100,7 +100,7 @@ function getScripts(cb) {
 			pending--;
 			d = JSON.parse(d || "{}");
 			var deps  = d.client_dependencies || [],
-				index = d.main;
+			    index = d.main;
 			if (!index.match(/\.js$/)) index += '.js';
 			deps.forEach(function(dep) {
 				walk(path.join(p, 'node_modules', dep));
@@ -263,8 +263,8 @@ function compileScripts(cb) {
 						if (settings.uglify) {
 							//Compress with UglifyJs
 							var jsp  = require("uglify-js").parser,
-								pro  = require("uglify-js").uglify,
-								code = jsp.parse(tmp);
+							    pro  = require("uglify-js").uglify,
+							    code = jsp.parse(tmp);
 							code = pro.ast_mangle(code);
 							code = pro.ast_squeeze(code);
 							tmp  = pro.gen_code(code);
@@ -287,7 +287,7 @@ function new_require(p) {
 	}
 
 	var mpath = path.dirname(module.parent.filename),
-		sp    = mpath.replace(/server/, '')+p;
+	    sp    = mpath.replace(/server/, '')+p;
 
 	//If the module doesn't exist, check in the server/ path.
 	if (!path.existsSync(p) && path.existsSync(sp)) p = sp;
@@ -320,7 +320,7 @@ function serveScript(p, cb) {
 
 				if (is_app) {
 					var tmp = path.join(__dirname, '..', 'templates', 'client_require.js'),
-						lab = path.join(__dirname, '..', 'templates', 'LAB.js');
+					    lab = path.join(__dirname, '..', 'templates', 'LAB.js');
 					getSrcs(function(e,srcs) {
 						var includes = "$LAB";
 						srcs.forEach(function(src) {
@@ -360,8 +360,8 @@ function serveScript(p, cb) {
 function handle(req,res) {
 
 	var url  = require('url').parse(req.url).path,
-		patt = '^'+settings.web_root.replace('/', '\/')+'(.*)$',
-		m    = url.match(new RegExp(patt));
+	    patt = '^'+settings.web_root.replace('/', '\/')+'(.*)$',
+	    m    = url.match(new RegExp(patt));
 
 	if (!m) return false;
 

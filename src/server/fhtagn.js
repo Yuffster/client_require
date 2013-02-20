@@ -74,7 +74,6 @@ function getScripts(cb) {
 
 	function grabFile(file, modulePath, initPath) {
 		var paths = contextualize(file,modulePath);
-		var module_path = modulePath || paths.module;
 		pending++;
 		fs.readFile(paths.file,'utf-8',function (err, f){
 			pending--;
@@ -154,7 +153,7 @@ function packScripts(scripts,cb) {
 	// without losing its module path aliases.
 	var files = {}, manifest = {};
 
-	function callback(e) {
+	function callback() {
 		packed = files;
 		var p = packCallbacks.shift();
 		while(p) {
@@ -223,7 +222,7 @@ function compileScripts(cb) {
 
 	compiling = true;
 
-	function callback(e) {
+	function callback() {
 		compiling = false;
 		var p = compilerCallbacks.shift();
 		while(p) {
@@ -328,7 +327,6 @@ function serveScript(p, cb) {
 						});
 						fs.readFile(tmp, 'utf-8', function(e,tmp) {
 							tmp = tmp.replace('{{LABScripts}}', includes);
-							var inits = "";
 							tmp = tmp.replace('{{initialize}}', getInitCode());
 							fs.readFile(lab, 'utf-8', function(e,f) {
 								tmp = tmp.replace('{{LAB.js}}', f);
@@ -376,14 +374,6 @@ function handle(req,res) {
 	});
 
 	return true;
-
-}
-
-function listen(server) {
-
-	server.on('request', function (req,res) {
-		handle(req, res);
-	});
 
 }
 

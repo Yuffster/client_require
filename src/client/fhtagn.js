@@ -21,6 +21,14 @@
 		path = path.replace(/^\.\//, '');
 		if (rel) rel = rel.replace("/client", '');
 
+		var mpath;
+
+		if (rel) {
+			mpath = rel.split('/') 
+			           .slice(0, rel.match(/node_modules/g).length*2)
+			           .join('/')+'/node_modules';
+		}
+
 		function grab(p) {
 			if (!cache[p]) {
 				cache[p] = modules[p](function(mod) {
@@ -30,13 +38,14 @@
 		}
 
 		for (var mod in modules) {
-			if (mod==path+'.js'
+			if ((mod==path+'.js'
 				|| mod==path+'.js'
 				|| rel+'/'+path+'.js'==mod
 				|| mod==path
 				|| mod.replace(/node_modules\//g, '')==path
 				|| rel+'/'+path==mod
-			) return grab(mod);
+				|| mpath&&mpath+'/'+path==mod
+			) && grab(mod)) return grab(mod);
 		}
 
 		throw "Cannot find module "+path+" (called from "+(rel||"root")+")";

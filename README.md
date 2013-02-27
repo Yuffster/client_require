@@ -30,8 +30,7 @@ If you find this library useful, please let me know!
 * [LAB.js](http://labjs.com/) by Getify Solutions <http://getify.com/>
 * [UglifyJS](http://marijn.haverbeke.nl/uglifyjs) by Mihai Bazon
 <http://mihai.bazon.net/blog>
-* [glob](http://github.com/isaacs/node-glob) by Isaac Z. Schlueter <izs.me>
-* And of course NPM by Isaac as well!
+* [glob](http://github.com/isaacs/node-glob) (and NPM!) by Isaac Z. Schlueter <izs.me>
 
 ## Using Modules
 

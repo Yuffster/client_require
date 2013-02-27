@@ -1,46 +1,48 @@
-(function(ns) {
+(function() {
 
-	var modules = {}, cache = {}, canon = {};
+	var modules = {}, cache = {};
 
-	if (typeof ns.__fhtagn__ == "undefined") {
-		ns.__fhtagn__ = {};
+	if (typeof __fhtagn__ == "undefined") {
+		window.__fhtagn__ = {};
+		__fhtagn__ = window.__fhtagn__;
 	}
 
-	ns.__fhtagn__.exp = function(paths,cpath,mod) {
-		for (var i in paths) {
-			modules[paths[i]] = mod;
-			canon[paths[i]]   = cpath;
-		}
+	__fhtagn__.exp = function(paths, mod) {
+		for (var i in paths) modules[paths[i]] = mod;
 	};
 
-	ns.__fhtagn__.req = function(path,rel) {
+	__fhtagn__.req = function(path,relative) {
+
+		var mod_relative;
+
+		if (relative=="__index__") relative = null;
+
+		mod_relative = relative+'/node_modules/'+path;
+
+		if (relative) path = relative+'/'+path;
 
 		if (cache[path]) return cache[path];
 
-		path = path.replace("/client", '');
-		path = path.replace(/^\.\//, '');
-		if (rel) rel = rel.replace("/client", '');
-
 		function grab(p) {
-			if (!cache[p]) {
-				cache[p] = modules[p](function(mod) {
-					return ns.__fhtagn__.req(mod, canon[p]);
-				});
-			} return cache[p];
+			cache[p] = modules[p](function(mod) {
+				return __fhtagn__.req(mod, p);
+			});
+			return cache[p];
 		}
 
 		for (var mod in modules) {
 			if (mod==path+'.js'
-				|| mod==path+'.js'
-				|| rel+'/'+path+'.js'==mod
+				|| mod==path.replace(/^\.\//, '')+'.js'
 				|| mod==path
 				|| mod.replace(/node_modules\//g, '')==path
-				|| rel+'/'+path==mod
+				|| mod_relative==mod
 			) return grab(mod);
 		}
 
-		throw "Cannot find module "+path+" (called from "+(rel||"root")+")";
+		console.error("Cannot find module", path);
 
-	};
+	}
 
-})(this);
+	__fhtagn__ = __fhtagn__;
+
+})();

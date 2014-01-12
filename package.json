@@ -5,7 +5,7 @@
 	"author" : "Michelle Steigerwalt <msteigerwalt.com>",
 	"repository" : {
 		"type" : "git",
-		"url" : "git://github.com/Yuffster/client_require.git"
+		"url" : "git://github.com/bgess/client_require.git"
 	},
 	"dependencies":{
 		"glob": "3.1.20",

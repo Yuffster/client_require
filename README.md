@@ -20,7 +20,7 @@ visit <http://github.com/Yuffster/client_require_demo>.
 
 ## Credits
 
-Copyright 2012-2013 by Michelle Steigerwalt <http://msteigerwalt.com> and licensed
+Copyright 2012-2014 by Michelle Steigerwalt <http://msteigerwalt.com> and licensed
 under the MIT license.
 
 If you find this library useful, please let me know!

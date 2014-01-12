@@ -8,10 +8,18 @@
  * instead of this one, and be much more efficient.
  */
 (new function(srcs) {
-	{{LAB.js}}
-	var $LAB = this.$LAB;
-	$LAB.setOptions({CacheBust:true,AlwaysPreserveOrder:true});
-	{{LABScripts}}.wait(function() {
+
+	function initialize() {
 		{{initialize}}
-	});
-}());
+	}
+
+	(function loadScript(n) {
+		if (!srcs[n]) return initialize();
+		var script    = document.createElement('script');
+		script.src    = srcs[n];
+		script.type   = "text/javascript";
+		document.body.appendChild(script);
+		script.onload = function() { loadScript(n); }; 
+	}(0))
+
+}({{srcs}}));

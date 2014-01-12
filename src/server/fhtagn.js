@@ -318,20 +318,12 @@ function serveScript(p, cb) {
 			if (settings.env!="production") {
 
 				if (is_app) {
-					var tmp = path.join(__dirname, '..', 'templates', 'client_require.js'),
-					    lab = path.join(__dirname, '..', 'templates', 'LAB.js');
+					var tmp = path.join(__dirname, '..', 'templates', 'client_require.js');
 					getSrcs(function(e,srcs) {
-						var includes = "$LAB";
-						srcs.forEach(function(src) {
-							includes += ".script('"+src+"')\n";
-						});
 						fs.readFile(tmp, 'utf-8', function(e,tmp) {
-							tmp = tmp.replace('{{LABScripts}}', includes);
+							tmp = tmp.replace('{{srcs}}', JSON.stringify(srcs));
 							tmp = tmp.replace('{{initialize}}', getInitCode());
-							fs.readFile(lab, 'utf-8', function(e,f) {
-								tmp = tmp.replace('{{LAB.js}}', f);
-								cb(null, tmp);
-							});
+							cb(null, tmp);
 						});
 					});
 					return;

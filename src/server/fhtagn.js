@@ -360,6 +360,7 @@ function handle(req,res) {
 			res.writeHead('404');
 			res.end("File not found");
 		} else {
+			res.setHeader('Content-Type', 'application/javascript');
 			res.writeHead('200');
 			res.end(d);
 		}

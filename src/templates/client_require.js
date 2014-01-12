@@ -19,7 +19,7 @@
 		script.src    = srcs[n];
 		script.type   = "text/javascript";
 		document.body.appendChild(script);
-		script.onload = function() { loadScript(n); }; 
+		script.onload = function() { loadScript(n++); }; 
 	}(0))
 
 }({{srcs}}));
